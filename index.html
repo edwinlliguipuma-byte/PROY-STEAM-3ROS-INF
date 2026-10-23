@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto STEAM: Cáncer y Autómatas Celulares | 3ro BGU</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif}
+body{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;color:#333}
+.container{max-width:1100px;margin:0 auto;background:rgba(255,255,255,0.98);border-radius:25px;box-shadow:0 25px 80px rgba(0,0,0,0.3);overflow:hidden}
+header{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 50%,#667eea 100%);color:white;padding:35px 30px;text-align:center;position:relative;overflow:hidden}
+header::before{content:'';position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%);animation:rotate 20s linear infinite}
+@keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.header-content{position:relative;z-index:1}
+.logo-container{display:flex;align-items:center;justify-content:center;gap:15px;margin-bottom:12px}
+.logo-icon{width:60px;height:60px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2em;border:2px solid rgba(255,255,255,0.3)}
+header h1{font-size:1.7em;margin-bottom:6px;text-shadow:2px 2px 4px rgba(0,0,0,0.2)}
+header p{opacity:0.95;font-size:0.95em;margin:4px 0}
+.badge{display:inline-block;background:rgba(255,255,255,0.25);padding:7px 18px;border-radius:25px;margin-top:12px;font-size:0.88em;border:1px solid rgba(255,255,255,0.3)}
+.content{padding:35px 30px}
+
+/* PANTALLA DE REGISTRO */
+.welcome-title{font-size:2em;color:#1e3c72;margin-bottom:8px;text-align:center;background:linear-gradient(135deg,#1e3c72,#667eea);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.welcome-subtitle{color:#666;font-size:1.05em;margin-bottom:25px;text-align:center}
+.info-banner{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);color:white;padding:18px;border-radius:15px;margin:20px 0;text-align:center;box-shadow:0 10px 30px rgba(245,87,108,0.3)}
+.info-banner h3{margin-bottom:8px;font-size:1.2em}
+.timer-banner{background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%);color:#0d5c4f;padding:15px;border-radius:15px;margin:20px 0;text-align:center;font-weight:bold;font-size:1.1em;box-shadow:0 5px 15px rgba(67,233,123,0.3)}
+.input-group{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0}
+@media(max-width:600px){.input-group{grid-template-columns:1fr}}
+input,select{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:12px;font-size:1em;transition:0.3s;background:white}
+input:focus,select:focus{border-color:#667eea;outline:none;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}
+.member-row{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:10px;align-items:center}
+.btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;padding:14px 38px;border-radius:12px;font-size:1.05em;font-weight:bold;cursor:pointer;transition:0.3s;margin:10px 5px;box-shadow:0 5px 15px rgba(102,126,234,0.3)}
+.btn:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(102,126,234,0.4)}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.btn-secondary{background:linear-gradient(135deg,#455a64,#607d8b);box-shadow:0 5px 15px rgba(69,90,100,0.3)}
+.btn-success{background:linear-gradient(135deg,#11998e,#38ef7d);box-shadow:0 5px 15px rgba(17,153,142,0.3)}
+.btn-danger{background:linear-gradient(135deg,#f5576c,#ff6b9d);box-shadow:0 5px 15px rgba(245,87,108,0.3)}
+.btn-small{padding:8px 16px;font-size:0.9em}
+.center{text-align:center}
+
+/* CLASE STEAM */
+.class-container{display:none}
+.class-nav{display:flex;gap:10px;margin-bottom:25px;flex-wrap:wrap;justify-content:center}
+.class-nav button{background:white;border:2px solid #667eea;color:#667eea;padding:10px 20px;border-radius:25px;cursor:pointer;font-weight:600;transition:0.3s}
+.class-nav button.active{background:linear-gradient(135deg,#667eea,#764ba2);color:white}
+.class-nav button:hover{transform:translateY(-2px)}
+.class-section{display:none;animation:fadeIn 0.5s}
+.class-section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.class-card{background:white;border-radius:18px;padding:28px;margin:20px 0;border-left:6px solid #667eea;box-shadow:0 10px 30px rgba(0,0,0,0.08)}
+.class-card h2{color:#1e3c72;margin-bottom:15px;font-size:1.5em}
+.class-card h3{color:#667eea;margin:15px 0 10px 0;font-size:1.2em}
+.class-card p,.class-card li{line-height:1.8;margin:8px 0;color:#333}
+.class-card ul,.class-card ol{margin-left:25px}
+.formula-box{background:linear-gradient(135deg,#f0f7ff,#e8eeff);border:2px solid #667eea;border-radius:12px;padding:20px;margin:15px 0;text-align:center;font-size:1.3em;font-family:'Cambria Math','Times New Roman',serif;color:#1e3c72;font-weight:bold}
+.example-box{background:#fff9e6;border-left:5px solid #f5a623;padding:18px;border-radius:10px;margin:15px 0}
+.example-box strong{color:#d97706}
+.graph-container{background:#fafbfc;border:2px solid #e0e0e0;border-radius:12px;padding:15px;margin:18px 0;text-align:center}
+.graph-container svg{max-width:100%;height:auto}
+.graph-title{font-size:0.9em;color:#666;margin-bottom:8px;font-weight:600}
+.highlight{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:3px 10px;border-radius:6px;font-weight:bold}
+.stem-cell{display:inline-block;width:20px;height:20px;background:radial-gradient(circle,#f5576c,#c2185b);border-radius:50%;margin:2px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.steam-badge{display:inline-block;background:linear-gradient(135deg,#f093fb,#f5576c);color:white;padding:5px 15px;border-radius:20px;font-size:0.85em;font-weight:bold;margin:5px}
+
+/* SIMULADOR */
+.quiz-container{display:none}
+.attempt-counter{background:linear-gradient(135deg,#fff3e0,#ffe0b2);padding:15px;border-radius:12px;margin:15px 0;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:600;color:#e65100}
+.time-remaining{background:linear-gradient(135deg,#ffebee,#ffcdd2);padding:15px;border-radius:12px;margin:15px 0;text-align:center;font-weight:bold;color:#c62828;font-size:1.1em}
+.progress-container{background:#e0e0e0;border-radius:10px;height:14px;margin:20px 0;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1)}
+.progress-bar{background:linear-gradient(90deg,#667eea,#764ba2,#f093fb);height:100%;width:0%;transition:width 0.5s ease;border-radius:10px;position:relative;overflow:hidden}
+.progress-bar::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.progress-info{display:flex;justify-content:space-between;margin-bottom:10px;font-size:0.93em;color:#555;font-weight:600}
+.question-card{background:white;border-radius:18px;padding:28px;margin:20px 0;border-left:6px solid #667eea;box-shadow:0 10px 30px rgba(0,0,0,0.08);animation:slideIn 0.5s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+.question-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.question-number{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:7px 16px;border-radius:25px;font-weight:bold;font-size:0.93em;box-shadow:0 3px 10px rgba(102,126,234,0.3)}
+.question-topic{background:#f0f7ff;color:#1e3c72;padding:7px 16px;border-radius:25px;font-size:0.88em;font-weight:600;border:1px solid #d0e4ff}
+.question-text{font-size:1.08em;line-height:1.7;margin:18px 0;color:#222}
+.math{font-family:'Cambria Math','Times New Roman',serif;font-style:italic;background:#f0f7ff;padding:3px 8px;border-radius:6px;color:#1e3c72;font-weight:500}
+.options{display:flex;flex-direction:column;gap:11px;margin-top:18px}
+.option{background:white;border:2px solid #e0e0e0;padding:14px 18px;border-radius:12px;cursor:pointer;transition:0.3s;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+.option:hover{border-color:#667eea;background:#f0f7ff;transform:translateX(5px)}
+.option.selected{border-color:#667eea;background:#e8eeff}
+.option.correct{border-color:#11998e;background:#e6fff8}
+.option.incorrect{border-color:#f5576c;background:#fff0f2}
+.option-letter{background:linear-gradient(135deg,#667eea,#764ba2);color:white;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0}
+.option.correct .option-letter{background:linear-gradient(135deg,#11998e,#38ef7d)}
+.option.incorrect .option-letter{background:linear-gradient(135deg,#f5576c,#ff6b9d)}
+.feedback{margin-top:22px;padding:18px;border-radius:12px;display:none;animation:fadeIn 0.4s}
+.feedback.show{display:block}
+.feedback.correct{background:linear-gradient(135deg,#e6fff8,#d4f5ed);border-left:5px solid #11998e;color:#0d5c4f}
+.feedback.incorrect{background:linear-gradient(135deg,#fff0f2,#ffe0e4);border-left:5px solid #f5576c;color:#8b1a2c}
+.feedback h4{margin-bottom:8px;font-size:1.15em}
+.feedback .explanation{font-size:0.96em;line-height:1.65;margin-top:8px}
+.nav-buttons{display:flex;justify-content:space-between;margin-top:28px;flex-wrap:wrap;gap:10px}
+
+/* RESULTADOS */
+.results{text-align:center;padding:20px}
+.score-circle{width:200px;height:200px;border-radius:50%;background:conic-gradient(#11998e var(--score,0%),#e0e0e0 0%);display:flex;align-items:center;justify-content:center;margin:22px auto;position:relative;box-shadow:0 10px 30px rgba(17,153,142,0.3)}
+.score-circle::before{content:'';position:absolute;width:170px;height:170px;background:white;border-radius:50%}
+.score-text{position:relative;z-index:1;font-size:2.4em;font-weight:bold;background:linear-gradient(135deg,#1e3c72,#667eea);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.results h2{color:#1e3c72;margin:15px 0;font-size:1.7em}
+.group-info{background:linear-gradient(135deg,#e3f2fd,#bbdefb);padding:20px;border-radius:15px;margin:20px 0;text-align:left}
+.group-info h3{color:#1565c0;margin-bottom:10px}
+.group-info ul{margin-left:20px}
+.group-info li{margin:5px 0;line-height:1.6}
+.warning-box{background:linear-gradient(135deg,#ffebee,#ffcdd2);border-left:5px solid #f5576c;padding:20px;border-radius:12px;margin:20px 0;text-align:center}
+.warning-box h3{color:#c62828;margin-bottom:10px}
+@media(max-width:600px){header h1{font-size:1.4em}.content{padding:18px}.question-card{padding:18px}.welcome-title{font-size:1.5em}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<div class="header-content">
+<div class="logo-container">
+<div class="logo-icon"></div>
+<div><h1>Proyecto STEAM: Cáncer y Autómatas Celulares</h1><p>3ro BGU - Sucesiones y Modelos Matemáticos</p></div>
+</div>
+<div class="badge">Msc. Edwin Lliguipuma E. | U.E. Dr. Enrique Noboa Arizaga</div>
+</div>
+</header>
+<div class="content" id="content">
+
+<!-- PANTALLA DE REGISTRO -->
+<div id="registerScreen">
+<h2 class="welcome-title">📋 Registro del Grupo de Trabajo</h2>
+<p class="welcome-subtitle">Complete los datos del grupo antes de acceder a la clase y el simulador</p>
+
+<div class="info-banner">
+<h3>⚠️ Importante: Solo 2 intentos permitidos</h3>
+<p>Cada grupo tiene máximo 2 oportunidades para realizar el simulador. Tiempo límite: 30 minutos.</p>
+</div>
+
+<div class="timer-banner">
+⏱️ TIEMPO DISPONIBLE: 30 MINUTOS PARA COMPLETAR LA EVALUACIÓN
+</div>
+
+<div class="class-card">
+<h3>👥 Datos del Grupo</h3>
+<div class="input-group">
+<select id="groupNumber">
+<option value="">Seleccione número de grupo</option>
+<option value="1">Grupo 1</option>
+<option value="2">Grupo 2</option>
+<option value="3">Grupo 3</option>
+<option value="4">Grupo 4</option>
+<option value="5">Grupo 5</option>
+<option value="6">Grupo 6</option>
+<option value="7">Grupo 7</option>
+<option value="8">Grupo 8</option>
+<option value="9">Grupo 9</option>
+<option value="10">Grupo 10</option>
+</select>
+<select id="groupCourse">
+<option value="">Seleccione curso</option>
+<option value="3ERO INFORMATICA A">3ERO INFORMATICA A</option>
+<option value="3ERO INF B">3ERO INF B</option>
+<option value="3ERO INF C">3ERO INF C</option>
+</select>
+</div>
+<div id="membersContainer"></div>
+<div class="input-group">
+<select id="groupSize">
+<option value="">Número de integrantes</option>
+<option value="3">3 integrantes</option>
+<option value="4">4 integrantes</option>
+</select>
+</div>
+<div class="center">
+<button class="btn" onclick="registerGroup()">📝 Registrar Grupo y Continuar</button>
+</div>
+</div>
+</div>
+
+<!-- CLASE STEAM -->
+<div class="class-container" id="classContainer">
+<h2 class="welcome-title">📚 Clase: Sucesiones y Proliferación Celular</h2>
+<p class="welcome-subtitle">Aprende los conceptos antes de realizar el simulador</p>
+
+<div class="class-nav">
+<button class="active" onclick="showSection(0)">1. Introducción</button>
+<button onclick="showSection(1)">2. Sucesiones</button>
+<button onclick="showSection(2)">3. Aritméticas</button>
+<button onclick="showSection(3)">4. Geométricas</button>
+<button onclick="showSection(4)">5. Proyecto STEAM</button>
+<button onclick="showSection(5)">6. Ejemplos</button>
+</div>
+
+<!-- SECCIÓN 1: INTRODUCCIÓN -->
+<div class="class-section active" id="section0">
+<div class="class-card">
+<h2>🎯 ¿Qué es el Proyecto STEAM?</h2>
+<p><span class="steam-badge">S</span> Ciencia &nbsp; <span class="steam-badge">T</span> Tecnología &nbsp; <span class="steam-badge">E</span> Ingeniería &nbsp; <span class="steam-badge">A</span> Arte &nbsp; <span class="steam-badge">M</span> Matemáticas</p>
+<p>El proyecto <strong>"Cáncer y Autómatas Celulares"</strong> conecta las <strong>matemáticas</strong> con la <strong>biología celular</strong>, específicamente con el estudio de la <strong>proliferación de células cancerosas</strong>.</p>
+<h3>🔬 Contexto Científico</h3>
+<p>Las células cancerosas se caracterizan por su capacidad de <strong>dividirse de manera descontrolada</strong>. En condiciones normales, las células se dividen siguiendo patrones regulares que pueden modelarse matemáticamente mediante <strong>sucesiones</strong>.</p>
+<div class="graph-container">
+<div class="graph-title">🧫 Simulación visual de proliferación celular</div>
+<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
+<text x="20" y="20" font-size="12" font-weight="bold" fill="#1e3c72">Etapa 1: 1 célula</text>
+<circle cx="50" cy="40" r="15" fill="#f5576c"/>
+<text x="120" y="20" font-size="12" font-weight="bold" fill="#1e3c72">Etapa 2: 2 células</text>
+<circle cx="130" cy="40" r="12" fill="#f5576c"/><circle cx="150" cy="40" r="12" fill="#f5576c"/>
+<text x="220" y="20" font-size="12" font-weight="bold" fill="#1e3c72">Etapa 3: 4 células</text>
+<circle cx="230" cy="35" r="10" fill="#f5576c"/><circle cx="250" cy="35" r="10" fill="#f5576c"/>
+<circle cx="230" cy="50" r="10" fill="#f5576c"/><circle cx="250" cy="50" r="10" fill="#f5576c"/>
+<text x="310" y="20" font-size="12" font-weight="bold" fill="#1e3c72">Etapa 4: 8 células</text>
+<circle cx="320" cy="30" r="8" fill="#f5576c"/><circle cx="335" cy="30" r="8" fill="#f5576c"/>
+<circle cx="320" cy="45" r="8" fill="#f5576c"/><circle cx="335" cy="45" r="8" fill="#f5576c"/>
+<circle cx="320" cy="60" r="8" fill="#f5576c"/><circle cx="335" cy="60" r="8" fill="#f5576c"/>
+<circle cx="320" cy="75" r="8" fill="#f5576c"/><circle cx="335" cy="75" r="8" fill="#f5576c"/>
+<text x="100" y="120" font-size="14" font-weight="bold" fill="#667eea">¡Crecimiento exponencial!</text>
+</svg>
+</div>
+<div class="example-box">
+<strong>💡 Dato importante:</strong> En este proyecto modelaremos cómo crece una población de células cancerosas usando sucesiones matemáticas. Cada célula se divide en 2 (o se triplica) en cada etapa.
+</div>
+<div class="center">
+<button class="btn" onclick="showSection(1)">Siguiente: Sucesiones →</button>
+</div>
+</div>
+</div>
+
+<!-- SECCIÓN 2: SUCESIONES -->
+<div class="class-section" id="section1">
+<div class="class-card">
+<h2>📐 ¿Qué es una Sucesión?</h2>
+<p>Una <strong>sucesión</strong> es un conjunto ordenado de números que siguen un patrón o regla determinada. Cada número de la sucesión se llama <strong>término</strong>.</p>
+<h3>📝 Notación</h3>
+<p>Los términos de una sucesión se denotan como:</p>
+<div class="formula-box">a₁, a₂, a, a₄, ..., aₙ, ...</div>
+<p>Donde <span class="math">aₙ</span> representa el término en la posición <span class="math">n</span>.</p>
+<h3> Ejemplo</h3>
+<p>Considera la sucesión: 2, 4, 6, 8, 10, ...</p>
+<ul>
+<li><span class="math">a₁ = 2</span> (primer término)</li>
+<li><span class="math">a₂ = 4</span> (segundo término)</li>
+<li><span class="math">a₃ = 6</span> (tercer término)</li>
+<li><span class="math">aₙ = 2n</span> (término general)</li>
+</ul>
+<h3>🎯 Tipos de Sucesiones</h3>
+<p>Existen dos tipos principales que estudiaremos:</p>
+<ul>
+<li><strong>Sucesiones Aritméticas:</strong> La diferencia entre términos consecutivos es constante</li>
+<li><strong>Sucesiones Geométricas:</strong> El cociente entre términos consecutivos es constante</li>
+</ul>
+<div class="center">
+<button class="btn btn-secondary" onclick="showSection(0)">← Anterior</button>
+<button class="btn" onclick="showSection(2)">Siguiente: Aritméticas →</button>
+</div>
+</div>
+</div>
+
+<!-- SECCIÓN 3: ARITMÉTICAS -->
+<div class="class-section" id="section2">
+<div class="class-card">
+<h2>➕ Sucesiones Aritméticas</h2>
+<p>En una sucesión aritmética, la <strong>diferencia</strong> entre dos términos consecutivos es siempre la misma. Esta diferencia se llama <strong>razón aritmética (d)</strong>.</p>
+<h3> Fórmula del Término General</h3>
+<div class="formula-box">aₙ = a₁ + (n - 1) · d</div>
+<p>Donde:</p>
+<ul>
+<li><span class="math">a₁</span> = primer término</li>
+<li><span class="math">d</span> = diferencia constante</li>
+<li><span class="math">n</span> = posición del término</li>
+</ul>
+<h3> Ejemplo Resuelto</h3>
+<div class="example-box">
+<strong>Ejemplo:</strong> Sucesión 3, 7, 11, 15, 19, ...<br>
+<strong>Paso 1:</strong> Identificar a₁ = 3<br>
+<strong>Paso 2:</strong> Calcular d = 7 - 3 = 4<br>
+<strong>Paso 3:</strong> Aplicar fórmula: aₙ = 3 + (n-1)·4 = 4n - 1<br>
+<strong>Paso 4:</strong> Calcular a₁₀ = 4(10) - 1 = 39
+</div>
+<h3>✅ Características</h3>
+<ul>
+<li>La diferencia <span class="math">d</span> puede ser positiva (sucesión creciente) o negativa (decreciente)</li>
+<li>El crecimiento es <strong>lineal</strong></li>
+<li>Gráficamente forma una <strong>línea recta</strong></li>
+</ul>
+<div class="center">
+<button class="btn btn-secondary" onclick="showSection(1)">← Anterior</button>
+<button class="btn" onclick="showSection(3)">Siguiente: Geométricas →</button>
+</div>
+</div>
+</div>
+
+<!-- SECCIÓN 4: GEOMÉTRICAS -->
+<div class="class-section" id="section3">
+<div class="class-card">
+<h2>✖️ Sucesiones Geométricas</h2>
+<p>En una sucesión geométrica, el <strong>cociente</strong> entre dos términos consecutivos es siempre el mismo. Este cociente se llama <strong>razón geométrica (r)</strong>.</p>
+<h3>📐 Fórmula del Término General</h3>
+<div class="formula-box">aₙ = a₁ · r^(n-1)</div>
+<p>Donde:</p>
+<ul>
+<li><span class="math">a₁</span> = primer término</li>
+<li><span class="math">r</span> = razón constante (cociente)</li>
+<li><span class="math">n</span> = posición del término</li>
+</ul>
+<h3>🔍 Ejemplo Resuelto</h3>
+<div class="example-box">
+<strong>Ejemplo:</strong> Sucesión 2, 6, 18, 54, 162, ...<br>
+<strong>Paso 1:</strong> Identificar a₁ = 2<br>
+<strong>Paso 2:</strong> Calcular r = 6/2 = 3<br>
+<strong>Paso 3:</strong> Aplicar fórmula: aₙ = 2 · 3^(n-1)<br>
+<strong>Paso 4:</strong> Calcular a₅ = 2 · 3⁴ = 2 · 81 = 162 ✓
+</div>
+<h3>✅ Características</h3>
+<ul>
+<li>La razón <span class="math">r</span> puede ser mayor que 1 (crecimiento exponencial) o entre 0 y 1 (decrecimiento)</li>
+<li>El crecimiento es <strong>exponencial</strong> (muy rápido)</li>
+<li>Es el modelo que usaremos para la proliferación celular</li>
+</ul>
+<div class="graph-container">
+<div class="graph-title">📈 Crecimiento geométrico vs aritmético</div>
+<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+<line x1="30" y1="180" x2="380" y2="180" stroke="#333" stroke-width="2"/>
+<line x1="30" y1="180" x2="30" y2="20" stroke="#333" stroke-width="2"/>
+<line x1="50" y1="170" x2="370" y2="80" stroke="#4facfe" stroke-width="3"/>
+<path d="M 50,170 Q 100,160 150,140 Q 200,110 250,70 Q 300,40 370,25" stroke="#f5576c" stroke-width="3" fill="none"/>
+<text x="300" y="75" font-size="11" fill="#f5576c" font-weight="bold">Geométrica</text>
+<text x="300" y="95" font-size="11" fill="#4facfe" font-weight="bold">Aritmética</text>
+<text x="150" y="195" font-size="11" fill="#333">n (etapas)</text>
+</svg>
+</div>
+<div class="center">
+<button class="btn btn-secondary" onclick="showSection(2)">← Anterior</button>
+<button class="btn" onclick="showSection(4)">Siguiente: Proyecto STEAM →</button>
+</div>
+</div>
+</div>
+
+<!-- SECCIÓN 5: PROYECTO STEAM -->
+<div class="class-section" id="section4">
+<div class="class-card">
+<h2>🧬 Proyecto STEAM: Cáncer y Autómatas Celulares</h2>
+<p>Aplicaremos las <strong>sucesiones geométricas</strong> para modelar el crecimiento de células cancerosas.</p>
+<h3>🔬 Modelo Matemático</h3>
+<p>Si una población de células cancerosas se <strong>duplica</strong> en cada etapa:</p>
+<div class="formula-box">aₙ = a₁ · 2^(n-1)</div>
+<p>Si se <strong>triplica</strong> en cada etapa:</p>
+<div class="formula-box">aₙ = a₁ · 3^(n-1)</div>
+<h3>📊 Tabla de Crecimiento (a₁ = 3, se duplica)</h3>
+<table style="width:100%;border-collapse:collapse;margin:15px 0">
+<thead>
+<tr style="background:linear-gradient(135deg,#667eea,#764ba2);color:white">
+<th style="padding:10px;border:1px solid #ddd">Etapa (n)</th>
+<th style="padding:10px;border:1px solid #ddd">Cálculo</th>
+<th style="padding:10px;border:1px solid #ddd">Células (aₙ)</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="padding:10px;border:1px solid #ddd;text-align:center">1</td><td style="padding:10px;border:1px solid #ddd">3 · 2⁰</td><td style="padding:10px;border:1px solid #ddd;text-align:center"><strong>3</strong></td></tr>
+<tr style="background:#f0f7ff"><td style="padding:10px;border:1px solid #ddd;text-align:center">2</td><td style="padding:10px;border:1px solid #ddd">3 · 2¹</td><td style="padding:10px;border:1px solid #ddd;text-align:center"><strong>6</strong></td></tr>
+<tr><td style="padding:10px;border:1px solid #ddd;text-align:center">3</td><td style="padding:10px;border:1px solid #ddd">3 · 2²</td><td style="padding:10px;border:1px solid #ddd;text-align:center"><strong>12</strong></td></tr>
+<tr style="background:#f0f7ff"><td style="padding:10px;border:1px solid #ddd;text-align:center">4</td><td style="padding:10px;border:1px solid #ddd">3 · 2³</td><td style="padding:10px;border:1px solid #ddd;text-align:center"><strong>24</strong></td></tr>
+<tr><td style="padding:10px;border:1px solid #ddd;text-align:center">5</td><td style="padding:10px;border:1px solid #ddd">3 · 2⁴</td><td style="padding:10px;border:1px solid #ddd;text-align:center"><strong>48</strong></td></tr>
+</tbody>
+</table>
+<h3>🎯 Relación de Recurrencia</h3>
+<p>La relación de recurrencia describe cómo obtener el siguiente término a partir del anterior:</p>
+<div class="formula-box">aₙ₊₁ = 2 · aₙ &nbsp;&nbsp; (si se duplica)<br>aₙ₊₁ = 3 · aₙ &nbsp;&nbsp; (si se triplica)</div>
+<div class="example-box">
+<strong>💡 Aplicación real:</strong> Los médicos usan estos modelos para predecir el crecimiento de tumores y planificar tratamientos. Conocer la fórmula explícita permite calcular cuántas células habrá en cualquier etapa sin tener que calcular todas las anteriores.
+</div>
+<div class="center">
+<button class="btn btn-secondary" onclick="showSection(3)">← Anterior</button>
+<button class="btn" onclick="showSection(5)">Siguiente: Ejemplos →</button>
+</div>
+</div>
+</div>
+
+<!-- SECCIÓN 6: EJEMPLOS -->
+<div class="class-section" id="section5">
+<div class="class-card">
+<h2>📝 Ejemplos Completos</h2>
+<h3>Ejemplo 1: Células que se duplican</h3>
+<div class="example-box">
+<strong>Problema:</strong> Un tumor comienza con 5 células cancerosas y se duplica en cada etapa. ¿Cuántas células habrá en la etapa 6?<br><br>
+<strong>Solución:</strong><br>
+• a₁ = 5, r = 2<br>
+• Fórmula: aₙ = 5 · 2^(n-1)<br>
+• a₆ = 5 · 2⁵ = 5 · 32 = <span class="highlight">160 células</span>
+</div>
+<h3>Ejemplo 2: Células que se triplican</h3>
+<div class="example-box">
+<strong>Problema:</strong> Una población de 2 células se triplica en cada etapa. Hallar a₄ y la fórmula explícita.<br><br>
+<strong>Solución:</strong><br>
+• a₁ = 2, r = 3<br>
+• Fórmula: aₙ = 2 · 3^(n-1)<br>
+• a₄ = 2 · 3³ = 2 · 27 = <span class="highlight">54 células</span>
+</div>
+<h3>Ejemplo 3: Identificar el tipo de sucesión</h3>
+<div class="example-box">
+<strong>Problema:</strong> La sucesión 4, 12, 36, 108, ... ¿es aritmética o geométrica?<br><br>
+<strong>Solución:</strong><br>
+• Diferencias: 12-4=8, 36-12=24 (no constante) → NO es aritmética<br>
+• Cocientes: 12/4=3, 36/12=3, 108/36=3 (constante) → <span class="highlight">Es geométrica con r=3</span><br>
+• Fórmula: aₙ = 4 · 3^(n-1)
+</div>
+<div class="info-banner" style="margin-top:20px">
+<h3>🎓 ¡Listo para el simulador!</h3>
+<p>Has completado la clase. Ahora realiza el simulador con 10 preguntas. Recuerda: solo tienes 2 intentos y 30 minutos.</p>
+</div>
+<div class="center">
+<button class="btn btn-secondary" onclick="showSection(4)">← Anterior</button>
+<button class="btn btn-success" onclick="startQuiz()">🚀 Iniciar Simulador (10 preguntas / 10 puntos)</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SIMULADOR -->
+<div class="quiz-container" id="quizContainer">
+<div class="attempt-counter" id="attemptCounter">
+ Intentos restantes: <span id="attemptsLeft">2</span> de 2
+</div>
+<div class="time-remaining" id="timeRemaining">
+⏱️ Tiempo restante: <span id="timer">30:00</span>
+</div>
+<div class="progress-info">
+<span id="progressText">Pregunta 1 de 10</span>
+<span id="scoreText">Puntaje: 0 / 10</span>
+</div>
+<div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+<div id="questionContainer"></div>
+<div class="nav-buttons">
+<button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()" disabled>← Anterior</button>
+<button class="btn" id="nextBtn" onclick="nextQuestion()">Siguiente →</button>
+<button class="btn btn-success" id="finishBtn" onclick="finishQuiz()" style="display:none">✅ Finalizar</button>
+</div>
+</div>
+
+<!-- RESULTADOS -->
+<div id="resultsScreen" style="display:none"></div>
+
+</div>
+</div>
+
+<script>
+// DATOS DEL GRUPO
+let groupData = {
+    number: '',
+    course: '',
+    size: 0,
+    members: [],
+    attempts: 0,
+    startTime: null,
+    endTime: null
+};
+
+// BANCO DE 10 PREGUNTAS
+const questions = [
+{type:'mc',topic:'Concepto de Sucesión',text:'¿Qué es una sucesión matemática?',options:['Un conjunto desordenado de números','Un conjunto ordenado de números que siguen un patrón','Una operación aritmética','Un tipo de función exponencial'],answer:1,explanation:'Una sucesión es un conjunto ORDENADO de números que siguen un patrón o regla determinada. Cada número se llama término.'},
+{type:'mc',topic:'Término General',text:'En la sucesión 2, 4, 6, 8, 10, ... ¿cuál es el término general aₙ?',options:['aₙ = n + 2','aₙ = 2n','aₙ = n²','aₙ = 2ⁿ'],answer:1,explanation:'Cada término es el doble de su posición: a₁=2(1)=2, a₂=2(2)=4, a₃=2(3)=6. Por tanto aₙ = 2n.'},
+{type:'mc',topic:'Sucesión Aritmética',text:'En la sucesión aritmética 5, 9, 13, 17, ... ¿cuál es la diferencia d?',options:['d = 3','d = 4','d = 5','d = 9'],answer:1,explanation:'La diferencia se calcula restando términos consecutivos: d = 9 - 5 = 4. Verificación: 13 - 9 = 4 ✓'},
+{type:'mc',topic:'Término Específico Aritmético',text:'Para la sucesión aritmética con a₁ = 3 y d = 5, ¿cuánto vale a₆?',options:['25','28','30','33'],answer:1,explanation:'Usando aₙ = a₁ + (n-1)·d: a₆ = 3 + (6-1)·5 = 3 + 25 = 28.'},
+{type:'mc',topic:'Sucesión Geométrica',text:'En la sucesión geométrica 3, 9, 27, 81, ... ¿cuál es la razón r?',options:['r = 2','r = 3','r = 6','r = 9'],answer:1,explanation:'La razón se calcula dividiendo términos consecutivos: r = 9/3 = 3. Verificación: 27/9 = 3 ✓'},
+{type:'mc',topic:'Fórmula Geométrica',text:'¿Cuál es la fórmula del término general de una sucesión geométrica?',options:['aₙ = a₁ + (n-1)·r','a = a₁ · r^(n-1)','aₙ = a₁ · n^r','a = a₁ + r·n'],answer:1,explanation:'La fórmula correcta es aₙ = a₁ · r^(n-1), donde a₁ es el primer término y r es la razón.'},
+{type:'mc',topic:'Proyecto STEAM - Duplica',text:'En el modelo de proliferación celular, si a₁ = 3 células y se DUPLICAN en cada etapa, ¿cuántas células hay en a₄?',options:['12','18','24','48'],answer:2,explanation:'a₁=3, a₂=6, a₃=12, a₄=24. O usando la fórmula: a₄ = 3 · 2³ = 3 · 8 = 24 células.'},
+{type:'mc',topic:'Proyecto STEAM - Triplica',text:'Si una población de células comienza con a₁ = 2 y se TRIPLICA en cada etapa, ¿cuál es la fórmula explícita?',options:['aₙ = 2 · 2^(n-1)','aₙ = 2 · 3^(n-1)','aₙ = 3 · 2^(n-1)','aₙ = 2 + 3n'],answer:1,explanation:'Como se triplica, r = 3. La fórmula es aₙ = a₁ · r^(n-1) = 2 · 3^(n-1).'},
+{type:'mc',topic:'Cálculo STEAM',text:'Con a₁ = 2 y r = 3 (se triplica), ¿cuántas células hay en la etapa 4 (a₄)?',options:['18','24','54','162'],answer:2,explanation:'a = 2 · 3^(4-1) = 2 · 3³ = 2 · 27 = 54 células.'},
+{type:'mc',topic:'Identificación de Sucesión',text:'La sucesión 4, 12, 36, 108, ... es:',options:['Aritmética con d = 8','Geométrica con r = 3','Aritmética con d = 4','Geométrica con r = 4'],answer:1,explanation:'Cocientes: 12/4=3, 36/12=3, 108/36=3. Como el cociente es constante (r=3), es geométrica.'}
+];
+
+let currentQuestion = 0;
+let userAnswers = new Array(questions.length).fill(null);
+let score = 0;
+let timeLeft = 30 * 60; // 30 minutos en segundos
+let timerInterval = null;
+
+// ACTUALIZAR INPUTS DE MIEMBROS
+function updateMemberInputs() {
+    const size = parseInt(document.getElementById('groupSize').value);
+    const container = document.getElementById('membersContainer');
+    container.innerHTML = '';
+    if (!size) return;
+    for (let i = 1; i <= size; i++) {
+        const row = document.createElement('div');
+        row.className = 'member-row';
+        row.innerHTML = `<input type="text" id="member${i}" placeholder="Nombre del integrante ${i}" />`;
+        container.appendChild(row);
+    }
+}
+
+document.getElementById('groupSize').addEventListener('change', updateMemberInputs);
+
+// REGISTRAR GRUPO
+function registerGroup() {
+    const number = document.getElementById('groupNumber').value;
+    const course = document.getElementById('groupCourse').value;
+    const size = parseInt(document.getElementById('groupSize').value);
+    
+    if (!number) { alert('⚠️ Seleccione el número de grupo.'); return; }
+    if (!course) { alert('⚠️ Seleccione el curso.'); return; }
+    if (!size) { alert('⚠️ Seleccione el número de integrantes.'); return; }
+    
+    const members = [];
+    for (let i = 1; i <= size; i++) {
+        const memberName = document.getElementById(`member${i}`).value.trim();
+        if (!memberName) {
+            alert(`️ Ingresa el nombre del integrante ${i}.`);
+            return;
+        }
+        members.push(memberName);
+    }
+    
+    // Verificar intentos previos
+    const storageKey = `steam_attempts_${number}_${course}`;
+    const prevAttempts = parseInt(localStorage.getItem(storageKey) || '0');
+    
+    if (prevAttempts >= 2) {
+        alert(`⛔ El Grupo ${number} de ${course} ya realizó los 2 intentos permitidos. No puede volver a ingresar.`);
+        return;
+    }
+    
+    groupData = { number, course, size, members, attempts: prevAttempts, startTime: new Date(), endTime: null };
+    
+    document.getElementById('registerScreen').style.display = 'none';
+    document.getElementById('classContainer').style.display = 'block';
+    document.getElementById('attemptsLeft').textContent = 2 - prevAttempts;
+}
+
+// NAVEGACIÓN DE CLASE
+function showSection(idx) {
+    const sections = document.querySelectorAll('.class-section');
+    const buttons = document.querySelectorAll('.class-nav button');
+    sections.forEach((s, i) => { s.classList.toggle('active', i === idx); });
+    buttons.forEach((b, i) => { b.classList.toggle('active', i === idx); });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// INICIAR SIMULADOR
+function startQuiz() {
+    document.getElementById('classContainer').style.display = 'none';
+    document.getElementById('quizContainer').style.display = 'block';
+    currentQuestion = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    score = 0;
+    timeLeft = 30 * 60;
+    groupData.startTime = new Date();
+    startTimer();
+    renderQuestion();
+}
+
+// TEMPORIZADOR
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById('timer').textContent = 
+            `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert('⏰ ¡Se acabó el tiempo! El simulador se cerrará automáticamente.');
+            finishQuiz(true);
+        }
+        
+        if (timeLeft <= 300) { // Menos de 5 minutos
+            document.getElementById('timeRemaining').style.background = 'linear-gradient(135deg,#ffcdd2,#ef9a9a)';
+            document.getElementById('timeRemaining').style.color = '#c62828';
+        }
+    }, 1000);
+}
+
+function renderQuestion() {
+    const q = questions[currentQuestion];
+    const container = document.getElementById('questionContainer');
+    let html = '<div class="question-card">';
+    html += '<div class="question-header">';
+    html += '<span class="question-number">Pregunta ' + (currentQuestion + 1) + ' / 10</span>';
+    html += '<span class="question-topic">📌 ' + q.topic + '</span>';
+    html += '</div>';
+    html += '<div class="question-text">' + q.text + '</div>';
+    
+    html += '<div class="options">';
+    const letters = ['A', 'B', 'C', 'D'];
+    for (let i = 0; i < q.options.length; i++) {
+        const selected = userAnswers[currentQuestion] === i ? 'selected' : '';
+        html += '<div class="option ' + selected + '" onclick="selectOption(' + i + ')">';
+        html += '<span class="option-letter">' + letters[i] + '</span>';
+        html += '<span>' + q.options[i] + '</span>';
+        html += '</div>';
+    }
+    html += '</div>';
+    
+    if (userAnswers[currentQuestion] !== null) {
+        const isCorrect = checkAnswer();
+        const feedbackClass = isCorrect ? 'correct' : 'incorrect';
+        const feedbackTitle = isCorrect ? '✅ ¡Correcto! (+1 punto)' : '❌ Incorrecto (0 puntos)';
+        html += '<div class="feedback show ' + feedbackClass + '">';
+        html += '<h4>' + feedbackTitle + '</h4>';
+        html += '<div class="explanation"><strong>📖 Justificación analítica:</strong> ' + q.explanation + '</div>';
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    container.innerHTML = html;
+    
+    document.getElementById('progressText').textContent = 'Pregunta ' + (currentQuestion + 1) + ' de 10';
+    document.getElementById('scoreText').textContent = 'Puntaje: ' + score + ' / 10';
+    document.getElementById('progressBar').style.width = ((currentQuestion + 1) / 10 * 100) + '%';
+    document.getElementById('prevBtn').disabled = currentQuestion === 0;
+    
+    if (currentQuestion === questions.length - 1) {
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('finishBtn').style.display = 'inline-block';
+    } else {
+        document.getElementById('nextBtn').style.display = 'inline-block';
+        document.getElementById('finishBtn').style.display = 'none';
+    }
+}
+
+function selectOption(i) {
+    if (userAnswers[currentQuestion] !== null) return;
+    userAnswers[currentQuestion] = i;
+    if (checkAnswer()) score++;
+    renderQuestion();
+}
+
+function checkAnswer() {
+    return userAnswers[currentQuestion] === questions[currentQuestion].answer;
+}
+
+function nextQuestion() {
+    if (userAnswers[currentQuestion] === null) {
+        alert('️ Debes responder la pregunta antes de continuar.');
+        return;
+    }
+    if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+    }
+}
+
+function prevQuestion() {
+    if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+    }
+}
+
+function finishQuiz(timeExpired = false) {
+    if (!timeExpired && !confirm('¿Estás seguro de finalizar el simulador? Esta acción registrará el intento.')) return;
+    
+    clearInterval(timerInterval);
+    groupData.endTime = new Date();
+    
+    // Registrar intento en localStorage
+    const storageKey = `steam_attempts_${groupData.number}_${groupData.course}`;
+    const newAttempts = groupData.attempts + 1;
+    localStorage.setItem(storageKey, newAttempts.toString());
+    
+    // Guardar datos completos del intento
+    const attemptData = {
+        groupNumber: groupData.number,
+        course: groupData.course,
+        members: groupData.members,
+        size: groupData.size,
+        attempt: newAttempts,
+        score: score,
+        startTime: groupData.startTime.toISOString(),
+        endTime: groupData.endTime.toISOString(),
+        date: groupData.startTime.toLocaleDateString('es-EC'),
+        time: groupData.startTime.toLocaleTimeString('es-EC')
+    };
+    
+    // Guardar en localStorage para que el docente pueda revisar
+    const allAttempts = JSON.parse(localStorage.getItem('steam_all_attempts') || '[]');
+    allAttempts.push(attemptData);
+    localStorage.setItem('steam_all_attempts', JSON.stringify(allAttempts));
+    
+    document.getElementById('quizContainer').style.display = 'none';
+    const results = document.getElementById('resultsScreen');
+    results.style.display = 'block';
+    
+    const nota = score;
+    const percentage = score * 10;
+    let message = '', emoji = '';
+    if (score >= 9) { message = '¡Excelente desempeño! Dominan el proyecto STEAM.'; emoji = '🏆'; }
+    else if (score >= 7) { message = 'Muy buen trabajo. Sigue practicando.'; emoji = ''; }
+    else if (score >= 6) { message = 'Buen esfuerzo. Refuercen algunos conceptos.'; emoji = ''; }
+    else if (score >= 5) { message = 'Necesitan repasar la clase. ¡No se rindan!'; emoji = '📚'; }
+    else { message = 'Deben estudiar más el tema. ¡Tú pueden!'; emoji = '💪'; }
+    
+    let membersHTML = '<ul>';
+    groupData.members.forEach((m, i) => { membersHTML += '<li><strong>Integrante ' + (i+1) + ':</strong> ' + m + '</li>'; });
+    membersHTML += '</ul>';
+    
+    let detailHTML = '';
+    for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const ok = userAnswers[i] === q.answer;
+        const userResp = userAnswers[i] !== null ? q.options[userAnswers[i]] : 'Sin responder';
+        const correctResp = q.options[q.answer];
+        detailHTML += '<div class="review-item ' + (ok ? 'ok' : 'fail') + '" style="background:white;padding:16px;margin:10px 0;border-radius:12px;border-left:5px solid ' + (ok ? '#11998e' : '#f5576c') + ';box-shadow:0 3px 10px rgba(0,0,0,0.05)">';
+        detailHTML += '<strong>P' + (i+1) + '. ' + q.topic + '</strong> ' + (ok ? '✅' : '❌') + ' - ' + (ok ? '1 punto' : '0 puntos') + '<br>';
+        detailHTML += '<small>Tu respuesta: ' + userResp + '</small>';
+        if (!ok) {
+            detailHTML += '<br><small style="color:#11998e"><strong>Respuesta correcta:</strong> ' + correctResp + '</small>';
+        }
+        detailHTML += '</div>';
+    }
+    
+    const attemptsLeft = 2 - newAttempts;
+    const attemptsWarning = attemptsLeft > 0 
+        ? '<div class="attempt-counter">📊 Intentos restantes: ' + attemptsLeft + ' de 2</div>'
+        : '<div class="warning-box"><h3>⛔ Intentos agotados</h3><p>Este grupo ya utilizó sus 2 intentos permitidos.</p></div>';
+    
+    results.innerHTML = '<div class="results">' +
+        '<h2>' + emoji + ' Resultados del Proyecto STEAM<br>Cáncer y Autómatas Celulares</h2>' +
+        '<div class="group-info">' +
+        '<h3> Datos del Grupo</h3>' +
+        '<p><strong>Grupo:</strong> ' + groupData.number + '</p>' +
+        '<p><strong>Curso:</strong> ' + groupData.course + '</p>' +
+        '<p><strong>Fecha:</strong> ' + attemptData.date + '</p>' +
+        '<p><strong>Hora de inicio:</strong> ' + attemptData.time + '</p>' +
+        '<p><strong>Número de integrantes:</strong> ' + groupData.size + '</p>' +
+        membersHTML +
+        '</div>' +
+        '<div class="score-circle" style="--score:' + percentage + '%"><div class="score-text">' + score + '/10</div></div>' +
+        '<h3 style="color:#1e3c72">Nota: ' + score.toFixed(1) + ' / 10 (' + percentage.toFixed(0) + '%)</h3>' +
+        '<p style="font-size:1.1em;margin:15px 0">' + message + '</p>' +
+        attemptsWarning +
+        '<h3 style="color:#1e3c72;margin-top:30px">📝 Detalle de Respuestas</h3>' +
+        '<div class="review-list">' + detailHTML + '</div>' +
+        '<br><button class="btn btn-secondary" onclick="window.print()">🖨 Imprimir Resultados para el Docente</button>' +
+        (attemptsLeft > 0 ? '<button class="btn" onclick="location.reload()">🔄 Realizar otro intento</button>' : '') +
+        '</div>';
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
